@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+<script>
+function _typeof(t){return(_typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t})(t)}!function(){for(var t,e,o=[],n=window,r=n;r;){try{if(r.frames.__tcfapiLocator){t=r;break}}catch(t){}if(r===n.top)break;r=n.parent}t||(function t(){var e=n.document,o=!!n.frames.__tcfapiLocator;if(!o)if(e.body){var r=e.createElement("iframe");r.style.cssText="display:none",r.name="__tcfapiLocator",e.body.appendChild(r)}else setTimeout(t,5);return!o}(),n.__tcfapi=function(){for(var t=arguments.length,n=new Array(t),r=0;r<t;r++)n[r]=arguments[r];if(!n.length)return o;"setGdprApplies"===n[0]?n.length>3&&2===parseInt(n[1],10)&&"boolean"==typeof n[3]&&(e=n[3],"function"==typeof n[2]&&n[2]("set",!0)):"ping"===n[0]?"function"==typeof n[2]&&n[2]({gdprApplies:e,cmpLoaded:!1,cmpStatus:"stub"}):o.push(n)},n.addEventListener("message",(function(t){var e="string"==typeof t.data,o={};if(e)try{o=JSON.parse(t.data)}catch(t){}else o=t.data;var n="object"===_typeof(o)?o.__tcfapiCall:null;n&&window.__tcfapi(n.command,n.version,(function(o,r){var a={__tcfapiReturn:{returnValue:o,success:r,callId:n.callId}};t&&t.source&&t.source.postMessage&&t.source.postMessage(e?JSON.stringify(a):a,"*")}),n.parameter)}),!1))}();
+</script>
+
+<script>
+    (function () { var e = false; var c = window; var t = document; function r() { if (!c.frames["__uspapiLocator"]) { if (t.body) { var a = t.body; var e = t.createElement("iframe"); e.style.cssText = "display:none"; e.name = "__uspapiLocator"; a.appendChild(e) } else { setTimeout(r, 5) } } } r(); function p() { var a = arguments; __uspapi.a = __uspapi.a || []; if (!a.length) { return __uspapi.a } else if (a[0] === "ping") { a[2]({ gdprAppliesGlobally: e, cmpLoaded: false }, true) } else { __uspapi.a.push([].slice.apply(a)) } } function l(t) { var r = typeof t.data === "string"; try { var a = r ? JSON.parse(t.data) : t.data; if (a.__cmpCall) { var n = a.__cmpCall; c.__uspapi(n.command, n.parameter, function (a, e) { var c = { __cmpReturn: { returnValue: a, success: e, callId: n.callId } }; t.source.postMessage(r ? JSON.stringify(c) : c, "*") }) } } catch (a) { } } if (typeof __uspapi !== "function") { c.__uspapi = p; __uspapi.msgHandler = l; c.addEventListener("message", l, false) } })();
+</script>
+<script id="sp-script"></script>
+</head>
+<body>
+    <h1>Sourcepoint Test Page</h1>
+    <input type="text" placeholder="Account Id" id="accountId"/><br>
+    <input type="text" placeholder="Property Name" id="propertyName"/><br>
+    <input type="text" placeholder="AuthId" id="authId"/><br>
+    <label for="gdpr-campaign">GDPR</label>
+    <input type="checkbox" id="gdpr"/><br>
+    <label for="gdpr-campaign">CCPA</label>
+    <input type="checkbox" id="ccpa"/><br>
+    <br>
+    <button onclick="window.cleanSpData()">Clean Data</button>
+    <button onclick="window.reloadScript()">Load Script</button>
+    <div>
+        <h2>GDPR</h2>
+        <p>consentUUID: <span id="gdpr-consentUUID"></span></p>
+        <p>euconsent: <span id="gdpr-euconsent"></span></p>
+    </div>
+    <div>
+        <h2>CCPA</h2>
+        <p>consentUUID: <span id="ccpa-consentUUID"></span></p>
+        <p>status: <span id="ccpa-status"></span></p>
+    </div>
+
+    <script>
+        window.reloadScript = function() {
+            document.getElementById("sp-script").remove();
+            var script = document.createElement("script");
+            script.id = "sp-script";
+            script.type = "text/javascript";
+            script.src = "https://cdn.privacy-mgmt.com/unified/wrapperMessagingWithoutDetection.js";
+            script.async = true
+            document.getElementsByTagName("head")[0].appendChild(script);
+            return false;
+        }
+    
+        window.cleanSpData = function() {
+            document.cookie.split(";").forEach(function(c) { 
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+            });
+            window.localStorage.clear();
+            spData = { 
+                gdpr: { consentUUID: "", euconsent: "" },
+                ccpa: { consentUUID: "", status: "" }
+            }
+            render();
+        }
+
+        window.update_sp_config = function (config) {
+            window._sp_.config.accountId = config.accountId
+            window._sp_.config.propertyHref = "https://"+config.propertyName
+            window._sp_.config.gdpr = config.gdpr ? {} : null
+            window._sp_.config.ccpa = config.ccpa ? {} : null
+            if(config.authId && config.authId !== "") {
+                window._sp_.config.authId = config.authId
+            } else {
+                delete window._sp_.config.authId
+            }
+        }
+
+        window.inputs = function() {
+            return Array.from(document.querySelectorAll('input'))
+        }
+
+        window.render = function() {
+            window.inputs().forEach(function(input) {
+                input.value = spConfig[input.id]
+                input.checked = spConfig[input.id] == true
+            })
+            document.querySelector('#gdpr-consentUUID').innerHTML = spData.gdpr.consentUUID
+            document.querySelector('#gdpr-euconsent').innerHTML = spData.gdpr.euconsent
+            document.querySelector('#ccpa-consentUUID').innerHTML = spData.ccpa.consentUUID
+            document.querySelector('#ccpa-status').innerHTML = spData.ccpa.status
+        }
+
+        window.addEventListeners = function () {
+            window.inputs().forEach(function (input) {
+                input.addEventListener('input', function(event) {
+                    if(event.target.type === "text") {
+                        window.spConfig[event.target.id] = event.target.value
+                    } else if (event.target.type === "checkbox") {
+                        window.spConfig[event.target.id] = event.target.checked
+                    }
+                    window.update_sp_config(window.spConfig)
+                });
+            });
+        }
+
+        window.setup = function() {
+            window.addEventListeners()
+            window.render(window.spConfig, window.spData)
+            window.update_sp_config(window.spConfig)
+        }
+    
+        window.spConfig = {
+            accountId: 22,
+            propertyName: 'mobile.multicampaign.demo',
+            authId: "",
+            gdpr: true,
+            ccpa: true
+        }
+
+        window.spData = {
+            gdpr: { consentUUID: "", euconsent: "" },
+            ccpa: { consentUUID: "", status: "" }
+        }
+
+        window._sp_queue = [];
+        window._sp_ = {
+            config: {
+                baseEndpoint: 'https://cdn.privacy-mgmt.com',
+                events: {
+                    onMessageReady: function (message_type) {},
+                    onMessageChoiceSelect: function (message_type, choice_id, choice_type_id) {},
+                    onPrivacyManagerAction: function (message_type, pmData) {},
+                    onMessageChoiceError: function (message_type, err) {},
+                    onPMCancel: function (message_type) {},
+                    onMessageReceiveData: function (message_type, data) {},
+                    onSPPMObjectReady: function () {},
+                    onConsentReady: function (message_type, consentUUID, euconsent) {
+                        if(message_type === "gdpr") {
+                            spData.gdpr = {
+                                consentUUID: consentUUID,
+                                euconsent: euconsent
+                            }
+                        }
+                        if(message_type === "ccpa") {
+                            spData.ccpa = {
+                                consentUUID: consentUUID,
+                                status: euconsent
+                            }
+                        }
+                        render()
+                    },
+                    onError: function (message_type, errorCode, errorObject, userReset) {}
+                }
+            }
+        }
+        
+        window.setup()
+    </script>
+</body>
+</html>
